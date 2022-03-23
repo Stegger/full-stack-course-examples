@@ -21,5 +21,4 @@ export const UserSchema = new EntitySchema<User>({
       type: 'varchar',
     },
   },
-  relations: {},
 });

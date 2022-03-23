@@ -1,16 +1,15 @@
 <template>
-  <h2>Send chat</h2>
+  <input v-model="txtRoomListener" placeholder="Enter room name" /> <br />
+  <button @click="listenToRoom">Connect</button>
+
+  <div>
+    <div v-for="(chat, index) in chatStore.chats" v-bind:key="index">
+      {{ chat.text }}
+    </div>
+  </div>
   <input v-model="txtChatInput" placeholder="Enter chat" /> <br />
   <input v-model="txtRoomInput" placeholder="Enter room" /> <br />
   <button @click="sendChat">Send</button>
-  <h2>All chats:</h2>
-  <input v-model="txtRoomListener" placeholder="Enter room name" /> <br />
-  <button @click="listenToRoom">Connect</button>
-  <ul>
-    <li v-for="(chat, index) in chatStore.chats" v-bind:key="index">
-      {{ chat.text }}
-    </li>
-  </ul>
 </template>
 
 <script setup lang="ts">

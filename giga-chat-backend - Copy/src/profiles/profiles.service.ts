@@ -12,6 +12,14 @@ export class ProfilesService {
     return createdProfile.save();
   }
 
+  findByGender(gender: string): Promise<Profile[]> {
+    return this.profileModel
+      .find({
+        gender: gender,
+      })
+      .exec();
+  }
+
   findAll() {
     return this.profileModel.find().exec();
   }

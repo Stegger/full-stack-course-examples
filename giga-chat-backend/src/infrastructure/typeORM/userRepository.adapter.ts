@@ -24,4 +24,8 @@ export class UserRepositoryAdapter implements IUserRepository {
       },
     });
   }
+
+  getAll(): Promise<User[]> {
+    return this.userRepo.find();
+  }
 }

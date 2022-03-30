@@ -1,27 +1,32 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
 import { CreateMatchDto } from './dto/create-match.dto';
 import { UpdateMatchDto } from './dto/update-match.dto';
 import { Model } from 'mongoose';
 import { Match } from './entities/match.entity';
+import { Cache } from 'cache-manager';
 
 @Injectable()
 export class MatchesService {
   constructor(
     @Inject('MATCH_MODEL') private readonly matchModel: Model<Match>,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
-  async create(createMatchDto: CreateMatchDto) {
-    console.log(createMatchDto);
+  public updateMatchInCache(value: Match) {
+    this.cacheManager.set<Match>(value.userUUID, value, {
+      ttl: 600,
+    });
+  }
+
+  async create(createMatchDto: CreateMatchDto): Promise<Match> {
     const match = await this.matchModel
       .findOne<Match>({
         userUUID: createMatchDto.userMatchSenderUUID,
       })
       .exec();
-    console.log('Break');
-    console.log(match);
     if (match) {
       if (createMatchDto.isAMatch) {
-        await this.matchModel
+        return this.matchModel
           .findOneAndUpdate(
             {
               userUUID: createMatchDto.userMatchSenderUUID,
@@ -32,7 +37,7 @@ export class MatchesService {
           )
           .exec();
       } else {
-        await this.matchModel
+        return this.matchModel
           .findOneAndUpdate(
             {
               userUUID: createMatchDto.userMatchSenderUUID,
@@ -51,7 +56,7 @@ export class MatchesService {
       } else {
         dislike.push(createMatchDto.userMatchReceiverUUID);
       }
-      await this.matchModel.create({
+      return this.matchModel.create({
         userUUID: createMatchDto.userMatchSenderUUID,
         likes: likes,
         disLikes: dislike,

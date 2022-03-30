@@ -10,8 +10,53 @@ export class MatchesService {
     @Inject('MATCH_MODEL') private readonly matchModel: Model<Match>,
   ) {}
 
-  create(createMatchDto: CreateMatchDto) {
-    return 'This action adds a new match';
+  async create(createMatchDto: CreateMatchDto) {
+    console.log(createMatchDto);
+    const match = await this.matchModel
+      .findOne<Match>({
+        userUUID: createMatchDto.userMatchSenderUUID,
+      })
+      .exec();
+    console.log('Break');
+    console.log(match);
+    if (match) {
+      if (createMatchDto.isAMatch) {
+        await this.matchModel
+          .findOneAndUpdate(
+            {
+              userUUID: createMatchDto.userMatchSenderUUID,
+            },
+            {
+              $push: { likes: createMatchDto.userMatchReceiverUUID },
+            },
+          )
+          .exec();
+      } else {
+        await this.matchModel
+          .findOneAndUpdate(
+            {
+              userUUID: createMatchDto.userMatchSenderUUID,
+            },
+            {
+              $push: { disLikes: createMatchDto.userMatchReceiverUUID },
+            },
+          )
+          .exec();
+      }
+    } else {
+      const likes = [];
+      const dislike = [];
+      if (createMatchDto.isAMatch) {
+        likes.push(createMatchDto.userMatchReceiverUUID);
+      } else {
+        dislike.push(createMatchDto.userMatchReceiverUUID);
+      }
+      await this.matchModel.create({
+        userUUID: createMatchDto.userMatchSenderUUID,
+        likes: likes,
+        disLikes: dislike,
+      });
+    }
   }
 
   findAll() {

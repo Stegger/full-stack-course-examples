@@ -4,6 +4,11 @@ export const mongodbProvider = [
   {
     provide: 'DATABASE_CONNECTION',
     useFactory: (): Promise<typeof mongoose> =>
-      mongoose.connect('mongodb://localhost/nest'),
+      mongoose.connect(
+        'mongodb+srv://stegger:FAKaG3jKTfVl5SbJ@granddatingchatapp.vvxbm.mongodb.net/myFirstDatabase?retryWrites=true&w=majority',
+      ),
   },
 ];
+
+//Localhost string:
+// 'mongodb://localhost/nest'
